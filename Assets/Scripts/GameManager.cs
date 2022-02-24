@@ -6,10 +6,14 @@ using Unity.Collections;
 public class GameManager : NetworkSingleton<GameManager>
 {
     public NetworkList<FixedString32Bytes> playerNames;
+
+
     public NetworkVariable<bool> gameStarted = new NetworkVariable<bool>(false);
     public NetworkVariable<int> lastPlayedCardNumber = new NetworkVariable<int>(0);
     public NetworkVariable<int> lastPlayedCardColor = new NetworkVariable<int>(0);
     public NetworkVariable<int> currentColor = new NetworkVariable<int>(0);
+    public NetworkVariable<int> currentTurn = new NetworkVariable<int>(0);
+    public NetworkVariable<int> turnIncrementor = new NetworkVariable<int>(1);
     private void Awake()
     {
         DontDestroyOnLoad(this);

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Kavyansh.Core.Singletons;
+using Unity.Netcode;
 
 public class Player : Singleton<Player>
 {
@@ -55,6 +56,11 @@ public class Player : Singleton<Player>
 
     private void DisplayCards()
     {
+        for(int i = 0;i < hand.Count; i++)
+        {
+            Destroy(hand[i]);
+        }
+        hand.Clear();
         DisplayLastPlayedCard();
         for(int i=0;i<cards.Count;i++)
         {
@@ -71,6 +77,7 @@ public class Player : Singleton<Player>
             GameObject symbol3 = GameObject.Instantiate(cardSymbols[cards[i].Number],temp.transform);
             symbol3.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
             symbol3.transform.localPosition = new Vector3(0, 0, -0.05f);
+            Component c = temp.AddComponent<DoubleClickPlay>();
             hand.Add(temp);
         }
     }
@@ -90,4 +97,57 @@ public class Player : Singleton<Player>
         symbol3.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
         symbol3.transform.localPosition = new Vector3(0, 0, -0.05f);
     }
+
+    public void PlayCard(GameObject o)
+    {
+        if (inGame)
+        {
+            if(GameManager.Instance.currentTurn.Value == (int)NetworkManager.Singleton.LocalClientId)
+            {
+                int index = 0;
+                for (int i = 0; i < hand.Count; i++)
+                {
+                    if (o == hand[i])
+                    {
+                        Debug.Log(cards[i]);
+                        index = i;
+                        break;
+                    }
+                }
+                if (IsValidCardToPlay(cards[index]))
+                {
+                    Play(cards[index]);
+                    Destroy(hand[index]);
+                    cards.RemoveAt(index);
+                    hand.RemoveAt(index);
+                    
+                }
+                DisplayCards();
+            }
+            
+        }
+    }
+
+    private bool IsValidCardToPlay(Card card)
+    {
+        if(card.Color == GameManager.Instance.currentColor.Value)
+        {
+            return true;
+        }
+        if(card.Number == GameManager.Instance.lastPlayedCardNumber.Value)
+        {
+            return true;
+        }
+        if(card.Color == 4)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void Play(Card card)
+    {
+
+    }
+
 }
