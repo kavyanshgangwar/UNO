@@ -82,9 +82,11 @@ public class Player : Singleton<Player>
         }
     }
 
-    private void DisplayLastPlayedCard()
+    public void DisplayLastPlayedCard()
     {
         Destroy(lastPlayedCard);
+        Debug.Log(GameManager.Instance.lastPlayedCardColor.Value);
+        Debug.Log(GameManager.Instance.lastPlayedCardNumber.Value);
         lastPlayedCard = GameObject.Instantiate(cardBackgrounds[GameManager.Instance.lastPlayedCardColor.Value]);
         lastPlayedCard.transform.position = new Vector3(0.6f, 2, -0.2f);
         GameObject symbol1 = GameObject.Instantiate(cardSymbols[GameManager.Instance.lastPlayedCardNumber.Value],lastPlayedCard.transform);
@@ -122,9 +124,9 @@ public class Player : Singleton<Player>
                     hand.RemoveAt(index);
                     
                 }
-                DisplayCards();
+                
             }
-            
+            DisplayCards();
         }
     }
 
@@ -147,7 +149,15 @@ public class Player : Singleton<Player>
 
     private void Play(Card card)
     {
-
+        GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId,card.Color,card.Number,card.Color);
     }
 
+    public void DrawCard(int numberOfCards)
+    {
+        for(int i = 0;i < numberOfCards; i++)
+        {
+            cards.Add(Card.GetRandomCard());
+        }
+        DisplayCards();
+    }
 }
