@@ -130,7 +130,7 @@ public class Player : Singleton<Player>
         }
     }
 
-    private bool IsValidCardToPlay(Card card)
+    public bool IsValidCardToPlay(Card card)
     {
         if(card.Color == GameManager.Instance.currentColor.Value)
         {
@@ -147,6 +147,8 @@ public class Player : Singleton<Player>
         return false;
     }
 
+    public void AddCard(Card card) { cards.Add(card); DisplayCards(); }
+
     private void Play(Card card)
     {
         if (card.Color == 4)
@@ -156,6 +158,7 @@ public class Player : Singleton<Player>
         else
         {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId,card.Color,card.Number,card.Color);
+            UIManager.Instance.CardPlayed();
         }
     }
 
@@ -167,4 +170,5 @@ public class Player : Singleton<Player>
         }
         DisplayCards();
     }
+    
 }

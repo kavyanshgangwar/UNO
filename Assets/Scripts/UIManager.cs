@@ -29,6 +29,18 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private Button yellowButton;
 
+    [SerializeField]
+    private Button drawCard;
+
+    [SerializeField]
+    private Button endTurn;
+
+    [SerializeField]
+    private Button callUno;
+
+    [SerializeField]
+    private Button claimUno;
+
     private Button red;
     private Button green;
     private Button blue;
@@ -44,7 +56,20 @@ public class UIManager : Singleton<UIManager>
                 Debug.Log("Starting the game...");
                 GameManager.Instance.StartGame();
                 startGameButton.gameObject.SetActive(false);
+                drawCard.gameObject.SetActive(true);
+                callUno.gameObject.SetActive(true);
+                claimUno.gameObject.SetActive(true);
             }
+        });
+        drawCard.onClick.AddListener(() => {
+            drawCard.gameObject.SetActive(false);
+            DrawCardButtonCall();
+
+        });
+        endTurn.onClick.AddListener(() => {
+            endTurn.gameObject.SetActive(false);
+            GameManager.Instance.EndTurnServerRpc((int)NetworkManager.Singleton.LocalClientId);
+            drawCard.gameObject.SetActive(true);
         });
     }
 
@@ -68,6 +93,10 @@ public class UIManager : Singleton<UIManager>
 
     public void DisplayChooseColorButtons(Card card)
     {
+        drawCard.gameObject.SetActive(false);
+        callUno.gameObject.SetActive(false);
+        endTurn.gameObject.SetActive(false);
+        claimUno.gameObject.SetActive(false);
         Destroy(red);
         Destroy(green);
         Destroy(blue);
@@ -75,34 +104,54 @@ public class UIManager : Singleton<UIManager>
         red = GameObject.Instantiate(redButton, canvas.transform);
         red.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 0);
-            red.gameObject.SetActive(false);
-            green.gameObject.SetActive(false);
-            blue.gameObject.SetActive(false);
-            yellow.gameObject.SetActive(false);
+            
+            CardPlayed();
         });
         green = GameObject.Instantiate(greenButton, canvas.transform);
         green.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 1);
-            red.gameObject.SetActive(false);
-            green.gameObject.SetActive(false);
-            blue.gameObject.SetActive(false);
-            yellow.gameObject.SetActive(false);
+            CardPlayed();
         });
         blue = GameObject.Instantiate(blueButton, canvas.transform);
         blue.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 3);
-            red.gameObject.SetActive(false);
-            green.gameObject.SetActive(false);
-            blue.gameObject.SetActive(false);
-            yellow.gameObject.SetActive(false);
+            CardPlayed();
         });
         yellow = GameObject.Instantiate(yellowButton, canvas.transform);
         yellow.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 2);
-            red.gameObject.SetActive(false);
-            green.gameObject.SetActive(false);
-            blue.gameObject.SetActive(false);
-            yellow.gameObject.SetActive(false);
+            CardPlayed();
         });
+    }
+
+    public void CardPlayed()
+    {
+        red.gameObject.SetActive(false);
+        green.gameObject.SetActive(false);
+        blue.gameObject.SetActive(false);
+        yellow.gameObject.SetActive(false);
+        drawCard.gameObject.SetActive(true);
+        callUno.gameObject.SetActive(true);
+        claimUno.gameObject.SetActive(true);
+        endTurn.gameObject.SetActive(false);
+    }
+    void DrawCardButtonCall()
+    {
+        if(GameManager.Instance.currentTurn.Value == (int)NetworkManager.Singleton.LocalClientId)
+        {
+            Card card = Card.GetRandomCard();
+            Player.Instance.AddCard(card);
+            if (Player.Instance.IsValidCardToPlay(card))
+            {
+                endTurn.gameObject.SetActive(true);
+
+            }
+            else
+            {
+                GameManager.Instance.EndTurnServerRpc((int)NetworkManager.Singleton.LocalClientId);
+                drawCard.gameObject.SetActive(true);
+            }
+            
+        }
     }
 }

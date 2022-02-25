@@ -57,6 +57,15 @@ public class GameManager : NetworkSingleton<GameManager>
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void EndTurnServerRpc(int clientId)
+    {
+        if(clientId == currentTurn.Value)
+        {
+            currentTurn.Value += turnIncrementor.Value;
+            currentTurn.Value = (currentTurn.Value + playerNames.Count)%playerNames.Count;
+        }
+    }
     [ServerRpc(RequireOwnership =false)]
     public void PlayCardServerRpc(int clientId,int cardColor,int cardNumber,int curColor)
     {
