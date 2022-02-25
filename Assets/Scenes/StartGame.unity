@@ -1284,6 +1284,10 @@ MonoBehaviour:
   canvas: {fileID: 1655539917}
   playerNameDisplayPrefab: {fileID: 1155499208359683493, guid: a1f76dad5eb274641a3193755a983e12, type: 3}
   startGameButton: {fileID: 1695113481}
+  redButton: {fileID: 3925882889852527455, guid: b27ce83b00d38f444abd2848b030661a, type: 3}
+  greenButton: {fileID: 4512924063803576784, guid: 84e61a436bfdc854998e6a0acbbecda8, type: 3}
+  blueButton: {fileID: 6838717494890065853, guid: bb91e4edf82dd1a4184839be05d12f88, type: 3}
+  yellowButton: {fileID: 4224116690938647001, guid: 2de00240a319d5d449c5ba7c1a5e0617, type: 3}
 --- !u!4 &1578113758
 Transform:
   m_ObjectHideFlags: 0

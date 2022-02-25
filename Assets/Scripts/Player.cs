@@ -149,7 +149,14 @@ public class Player : Singleton<Player>
 
     private void Play(Card card)
     {
-        GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId,card.Color,card.Number,card.Color);
+        if (card.Color == 4)
+        {
+            UIManager.Instance.DisplayChooseColorButtons(card);
+        }
+        else
+        {
+            GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId,card.Color,card.Number,card.Color);
+        }
     }
 
     public void DrawCard(int numberOfCards)
