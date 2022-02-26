@@ -83,6 +83,10 @@ public class UIManager : Singleton<UIManager>
                 claimUno.gameObject.SetActive(true);
             }
         });
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            startGameButton.gameObject.SetActive(false);
+        }
         drawCard.onClick.AddListener(() => {
             drawCard.gameObject.SetActive(false);
             DrawCardButtonCall();
@@ -229,7 +233,7 @@ public class UIManager : Singleton<UIManager>
         Destroy(GameObject.Instantiate(claimedUNOText, canvas.transform), 2f);
     }
 
-    public void GameOver()
+    public void GameOver(int clientId)
     {
         Debug.Log("GameOver!");
         Debug.Log(GameManager.Instance.playerNames[GameManager.Instance.previousTurn.Value]+" wins!");

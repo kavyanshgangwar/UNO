@@ -19,6 +19,8 @@ public class GameManager : NetworkSingleton<GameManager>
     public NetworkVariable<int> currentTurn = new NetworkVariable<int>(0);
     public NetworkVariable<int> turnIncrementor = new NetworkVariable<int>(1);
     public NetworkVariable<int> previousTurn = new NetworkVariable<int>(0);
+
+    public int winner = 0;
     private void Awake()
     {
         DontDestroyOnLoad(this);
@@ -186,9 +188,10 @@ public class GameManager : NetworkSingleton<GameManager>
     }
 
     [ClientRpc]
-    public void GameOverClientRpc()
+    public void GameOverClientRpc(int clientId)
     {
-        UIManager.Instance.GameOver();
+        winner = clientId;
+        UIManager.Instance.GameOver(clientId);
     }
 
     [ClientRpc]
@@ -206,7 +209,7 @@ public class GameManager : NetworkSingleton<GameManager>
         if(cardsCount[previousTurn.Value] == 0)
         {
             gameStarted.Value = false;
-            GameOverClientRpc();
+            GameOverClientRpc(previousTurn.Value);
         }
     }
 }

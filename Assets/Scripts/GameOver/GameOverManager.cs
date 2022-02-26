@@ -16,7 +16,7 @@ public class GameOverManager : Singleton<GameOverManager>
     // Start is called before the first frame update
     void Start()
     {
-        gameOverText.GetComponent<TextMeshProUGUI>().text = GameManager.Instance.playerNames[GameManager.Instance.previousTurn.Value] + " Wins!";
+        gameOverText.GetComponent<TextMeshProUGUI>().text = GameManager.Instance.playerNames[GameManager.Instance.winner] + " Wins!";
         playAgain.onClick.AddListener(() => { GameManager.Instance.PlayAgainServerRpc(); });
     }
 
