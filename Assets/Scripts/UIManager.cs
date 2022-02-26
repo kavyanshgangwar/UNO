@@ -44,6 +44,9 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private GameObject cardDisplay;
 
+    [SerializeField]
+    private GameObject uno;
+
     private Color[] colorList;
 
     private Button red;
@@ -51,7 +54,7 @@ public class UIManager : Singleton<UIManager>
     private Button blue;
     private Button yellow;
 
-    
+    public bool choosingColor=false;
 
     private int playersTillNow = 0;
 
@@ -85,6 +88,12 @@ public class UIManager : Singleton<UIManager>
             endTurn.gameObject.SetActive(false);
             GameManager.Instance.EndTurnServerRpc((int)NetworkManager.Singleton.LocalClientId);
             drawCard.gameObject.SetActive(true);
+        });
+        callUno.onClick.AddListener(() => {
+            if (Player.Instance.cards.Count <= 2)
+            {
+                GameManager.Instance.CallUNOServerRpc((int)NetworkManager.Singleton.LocalClientId);
+            }
         });
     }
 
@@ -132,6 +141,7 @@ public class UIManager : Singleton<UIManager>
 
     public void DisplayChooseColorButtons(Card card)
     {
+        choosingColor = true;
         drawCard.gameObject.SetActive(false);
         callUno.gameObject.SetActive(false);
         endTurn.gameObject.SetActive(false);
@@ -143,31 +153,38 @@ public class UIManager : Singleton<UIManager>
         red = GameObject.Instantiate(redButton, canvas.transform);
         red.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 0);
-            
+            choosingColor = false;
             CardPlayed();
         });
         green = GameObject.Instantiate(greenButton, canvas.transform);
         green.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 1);
+            choosingColor = false;
             CardPlayed();
         });
         blue = GameObject.Instantiate(blueButton, canvas.transform);
         blue.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 3);
+            choosingColor = false;
             CardPlayed();
         });
         yellow = GameObject.Instantiate(yellowButton, canvas.transform);
         yellow.onClick.AddListener(() => {
             GameManager.Instance.PlayCardServerRpc((int)NetworkManager.Singleton.LocalClientId, card.Color, card.Number, 2);
+            choosingColor = false;
             CardPlayed();
         });
     }
 
     public void CardPlayed()
     {
+        if(red!=null)
         red.gameObject.SetActive(false);
+        if(green!=null)
         green.gameObject.SetActive(false);
+        if(blue!=null)
         blue.gameObject.SetActive(false);
+        if(yellow!=null)
         yellow.gameObject.SetActive(false);
         drawCard.gameObject.SetActive(true);
         callUno.gameObject.SetActive(true);
@@ -193,5 +210,11 @@ public class UIManager : Singleton<UIManager>
             }
             
         }
+    }
+
+    public void DisplayUNO()
+    {
+        Debug.Log("UNO!");
+        Destroy(GameObject.Instantiate(uno, canvas.transform), 1f);
     }
 }

@@ -6,6 +6,7 @@ public class DoubleClickPlay : MonoBehaviour
 {
     private void OnMouseDrag()
     {
+        if (UIManager.Instance.choosingColor) return;
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         transform.Translate(mousePosition);
     }

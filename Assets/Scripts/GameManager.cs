@@ -9,12 +9,15 @@ public class GameManager : NetworkSingleton<GameManager>
 
     public NetworkList<int> cardsCount;
 
+    private NetworkList<bool> unoFlags;
+
     public NetworkVariable<bool> gameStarted = new NetworkVariable<bool>(false);
     public NetworkVariable<int> lastPlayedCardNumber = new NetworkVariable<int>(0);
     public NetworkVariable<int> lastPlayedCardColor = new NetworkVariable<int>(0);
     public NetworkVariable<int> currentColor = new NetworkVariable<int>(0);
     public NetworkVariable<int> currentTurn = new NetworkVariable<int>(0);
     public NetworkVariable<int> turnIncrementor = new NetworkVariable<int>(1);
+    public NetworkVariable<int> previousTurn = new NetworkVariable<int>(0);
     private void Awake()
     {
         DontDestroyOnLoad(this);
@@ -34,6 +37,7 @@ public class GameManager : NetworkSingleton<GameManager>
                 {
                     cardsCount = new NetworkList<int>();
                     playerNames = new NetworkList<FixedString32Bytes>();
+                    unoFlags = new NetworkList<bool>();
                 }
                 playerNames.Add("Player " + id);
                 cardsCount.Add(0);
@@ -62,6 +66,10 @@ public class GameManager : NetworkSingleton<GameManager>
             {
                 cardsCount.Add(7);
             }
+            for(int i = 0;i < cardsCount.Count; i++)
+            {
+                unoFlags.Add(false);
+            }
         }
     }
     [ServerRpc(RequireOwnership =false)]
@@ -76,8 +84,22 @@ public class GameManager : NetworkSingleton<GameManager>
     {
         if(clientId == currentTurn.Value)
         {
+            previousTurn.Value = currentTurn.Value;
             currentTurn.Value += turnIncrementor.Value;
             currentTurn.Value = (currentTurn.Value + playerNames.Count)%playerNames.Count;
+        }
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void CallUNOServerRpc(int clientId)
+    {
+        if(currentTurn.Value == clientId)
+        {
+            if(cardsCount[clientId] <= 2)
+            {
+                unoFlags[clientId] = true;
+                DisplayUNOClientRpc();
+            }
         }
     }
     [ServerRpc(RequireOwnership =false)]
@@ -87,10 +109,11 @@ public class GameManager : NetworkSingleton<GameManager>
         if (currentTurn.Value == clientId)
         {
             cardsCount[clientId]--;
+            unoFlags[previousTurn.Value] = false;
             currentColor.Value = curColor;
             lastPlayedCardColor.Value = cardColor;
             lastPlayedCardNumber.Value = cardNumber;
-            
+            previousTurn.Value = currentTurn.Value;
             if(cardNumber == 9)
             {
                 currentTurn.Value += turnIncrementor.Value;
@@ -116,7 +139,6 @@ public class GameManager : NetworkSingleton<GameManager>
             }
             currentTurn.Value += turnIncrementor.Value;
             currentTurn.Value = (currentTurn.Value + playerNames.Count) % playerNames.Count;
-            
         }
     }
 
@@ -126,6 +148,12 @@ public class GameManager : NetworkSingleton<GameManager>
         
         Debug.Log("this is the client " + NetworkManager.Singleton.LocalClientId);
         Player.Instance.DrawCard(numberOfCards);
+    }
+
+    [ClientRpc]
+    public void DisplayUNOClientRpc()
+    {
+        UIManager.Instance.DisplayUNO();
     }
 
     void CardPlayed(int oldValue,int newValue)

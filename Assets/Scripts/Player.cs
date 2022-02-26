@@ -66,8 +66,8 @@ public class Player : Singleton<Player>
         {
             Debug.Log(cards[i]);
             GameObject temp = GameObject.Instantiate(cardBackgrounds[cards[i].Color]);
-            float cardXPos = -4.5f + (9f /(cards.Count-1f)) * i;
-            temp.transform.position = new Vector3(cardXPos, -2f, -1f -(4f/(cards.Count-1))*i);
+            float cardXPos = cards.Count>1? -4.5f + (9f /(cards.Count-1f)) * i:0;
+            temp.transform.position = new Vector3(cardXPos, -2f, cards.Count>1?-1f -(4f/(cards.Count-1))*i:-1f);
             GameObject symbol1 = GameObject.Instantiate(cardSymbols[cards[i].Number], temp.transform);
             symbol1.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             symbol1.transform.localPosition = new Vector3(-0.7f, 1.2f, -0.05f);
