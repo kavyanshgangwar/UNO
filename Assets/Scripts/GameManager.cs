@@ -2,6 +2,7 @@ using Kavyansh.Core.Singletons;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
@@ -56,6 +57,7 @@ public class GameManager : NetworkSingleton<GameManager>
         if (IsHost)
         {
             gameStarted.Value = true;
+            turnIncrementor.Value = 1;
             Debug.Log("gettting starter card");
             Card card = Card.GetStarterCard();
             lastPlayedCardColor.Value = card.Color;
@@ -66,11 +68,18 @@ public class GameManager : NetworkSingleton<GameManager>
             {
                 cardsCount.Add(7);
             }
+            unoFlags.Clear();
             for(int i = 0;i < cardsCount.Count; i++)
             {
                 unoFlags.Add(false);
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void PlayAgainServerRpc()
+    {
+        PlayAgainClientRpc();
     }
     [ServerRpc(RequireOwnership =false)]
     public void IncrementCardCountServerRpc(int x,int clientId)
@@ -152,6 +161,7 @@ public class GameManager : NetworkSingleton<GameManager>
             }
             currentTurn.Value += turnIncrementor.Value;
             currentTurn.Value = (currentTurn.Value + playerNames.Count) % playerNames.Count;
+            IsGameOver();
         }
     }
 
@@ -174,8 +184,29 @@ public class GameManager : NetworkSingleton<GameManager>
     {
         UIManager.Instance.ClaimedUNO();
     }
+
+    [ClientRpc]
+    public void GameOverClientRpc()
+    {
+        UIManager.Instance.GameOver();
+    }
+
+    [ClientRpc]
+    public void PlayAgainClientRpc()
+    {
+        SceneManager.LoadScene("StartGame");
+    }
     void CardPlayed(int oldValue,int newValue)
     {
         Player.Instance.DisplayLastPlayedCard();
+    }
+
+    void IsGameOver()
+    {
+        if(cardsCount[previousTurn.Value] == 0)
+        {
+            gameStarted.Value = false;
+            GameOverClientRpc();
+        }
     }
 }

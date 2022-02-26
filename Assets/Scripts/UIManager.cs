@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -226,5 +227,12 @@ public class UIManager : Singleton<UIManager>
     {
         Debug.Log("OOPS! looks like someone forgot to call UNO!");
         Destroy(GameObject.Instantiate(claimedUNOText, canvas.transform), 2f);
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("GameOver!");
+        Debug.Log(GameManager.Instance.playerNames[GameManager.Instance.previousTurn.Value]+" wins!");
+        SceneManager.LoadScene("GameOver");
     }
 }
