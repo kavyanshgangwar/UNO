@@ -41,15 +41,30 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private Button claimUno;
 
+    [SerializeField]
+    private GameObject cardDisplay;
+
+    private Color[] colorList;
+
     private Button red;
     private Button green;
     private Button blue;
     private Button yellow;
 
+    
+
     private int playersTillNow = 0;
+
+    private List<GameObject> cardsCountDisplay;
     // Start is called before the first frame update
     void Start()
     {
+        colorList = new Color[4];
+        colorList[0] = new Color(0.961f, 0.165f, 0.020f, 1f);
+        colorList[1] = new Color(0.047f, 0.655f, 0.220f,1f);
+        colorList[2] = new Color(0.988f, 0.792f, 0.012f,1f);
+        colorList[3] = new Color(0.086f, 0.369f, 0.733f,1f);
+        cardsCountDisplay = new List<GameObject>();
         startGameButton.onClick.AddListener(() => {
             if (NetworkManager.Singleton.IsHost)
             {
@@ -89,6 +104,30 @@ public class UIManager : Singleton<UIManager>
             }
             playersTillNow = GameManager.Instance.playerNames.Count;
         }
+        UpdateCardsCount();
+    }
+
+    void UpdateCardsCount()
+    {
+        if (GameManager.Instance.cardsCount == null) return;
+        if (cardsCountDisplay.Count < GameManager.Instance.cardsCount.Count)
+        {
+            for (int i = cardsCountDisplay.Count; i < GameManager.Instance.cardsCount.Count; i++)
+            {
+                GameObject a = GameObject.Instantiate(cardDisplay, canvas.transform);
+                TextMeshProUGUI count = a.GetComponentInChildren<TextMeshProUGUI>();
+                count.text = GameManager.Instance.cardsCount[i].ToString();
+                a.transform.position = new Vector3(310, 1020 - 70 * i, -1);
+                cardsCountDisplay.Add(a);
+            }
+        }
+        for (int i = 0; i < cardsCountDisplay.Count; i++)
+        {
+            cardsCountDisplay[i].GetComponentInChildren<TextMeshProUGUI>().text = GameManager.Instance.cardsCount[i].ToString();
+            cardsCountDisplay[i].GetComponent<Image>().color = Color.black;
+        }
+        cardsCountDisplay[GameManager.Instance.currentTurn.Value].GetComponent<Image>().color = colorList[GameManager.Instance.currentColor.Value];
+        
     }
 
     public void DisplayChooseColorButtons(Card card)
@@ -141,6 +180,7 @@ public class UIManager : Singleton<UIManager>
         {
             Card card = Card.GetRandomCard();
             Player.Instance.AddCard(card);
+            GameManager.Instance.IncrementCardCountServerRpc(1,(int)NetworkManager.Singleton.LocalClientId);
             if (Player.Instance.IsValidCardToPlay(card))
             {
                 endTurn.gameObject.SetActive(true);

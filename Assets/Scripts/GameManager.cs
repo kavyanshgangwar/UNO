@@ -7,6 +7,7 @@ public class GameManager : NetworkSingleton<GameManager>
 {
     public NetworkList<FixedString32Bytes> playerNames;
 
+    public NetworkList<int> cardsCount;
 
     public NetworkVariable<bool> gameStarted = new NetworkVariable<bool>(false);
     public NetworkVariable<int> lastPlayedCardNumber = new NetworkVariable<int>(0);
@@ -31,9 +32,11 @@ public class GameManager : NetworkSingleton<GameManager>
             {
                 if(playerNames == null)
                 {
+                    cardsCount = new NetworkList<int>();
                     playerNames = new NetworkList<FixedString32Bytes>();
                 }
                 playerNames.Add("Player " + id);
+                cardsCount.Add(0);
             }
         };
     }
@@ -54,7 +57,18 @@ public class GameManager : NetworkSingleton<GameManager>
             lastPlayedCardColor.Value = card.Color;
             lastPlayedCardNumber.Value = card.Number;
             currentColor.Value = card.Color;
+            cardsCount.Clear();
+            for(int i = 0; i < playerNames.Count; i++)
+            {
+                cardsCount.Add(7);
+            }
         }
+    }
+    [ServerRpc(RequireOwnership =false)]
+    public void IncrementCardCountServerRpc(int x,int clientId)
+    {
+        if (!IsServer) { return; }
+        cardsCount[clientId] += x;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -72,6 +86,7 @@ public class GameManager : NetworkSingleton<GameManager>
         if (!IsServer) return;
         if (currentTurn.Value == clientId)
         {
+            cardsCount[clientId]--;
             currentColor.Value = curColor;
             lastPlayedCardColor.Value = cardColor;
             lastPlayedCardNumber.Value = cardNumber;
@@ -86,6 +101,7 @@ public class GameManager : NetworkSingleton<GameManager>
             {
                 currentTurn.Value+=turnIncrementor.Value;
                 currentTurn.Value = (currentTurn.Value+playerNames.Count) % playerNames.Count;
+                cardsCount[currentTurn.Value]+=2;
                 // make the next player draw 2 cards
                 ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)currentTurn.Value } } };
                 DrawCardClientRpc(2, clientRpcParams);
@@ -93,6 +109,7 @@ public class GameManager : NetworkSingleton<GameManager>
             {
                 currentTurn.Value += turnIncrementor.Value;
                 currentTurn.Value = (currentTurn.Value + playerNames.Count) % playerNames.Count;
+                cardsCount[currentTurn.Value] += 4;
                 // make the next player draw 4 cards
                 ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)currentTurn.Value } } };
                 DrawCardClientRpc(4, clientRpcParams);

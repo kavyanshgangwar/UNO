@@ -1022,6 +1022,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93288d82e4b60234783513ef88bff817, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameStarted:
+    m_InternalValue: 0
+  lastPlayedCardNumber:
+    m_InternalValue: 0
+  lastPlayedCardColor:
+    m_InternalValue: 0
+  currentColor:
+    m_InternalValue: 0
+  currentTurn:
+    m_InternalValue: 0
+  turnIncrementor:
+    m_InternalValue: 1
 --- !u!4 &1127384066
 Transform:
   m_ObjectHideFlags: 0
