@@ -107,7 +107,7 @@ public class GameManager : NetworkSingleton<GameManager>
     public void ClaimUNOServerRpc()
     {
         if (unoFlags[previousTurn.Value] == true) return;
-        if(cardsCount[previousTurn.Value] <8)
+        if(cardsCount[previousTurn.Value] <2)
         {
             cardsCount[previousTurn.Value] += 4;
             ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)previousTurn.Value } } };
