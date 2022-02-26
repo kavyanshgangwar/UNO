@@ -2078,6 +2078,7 @@ MonoBehaviour:
   claimUno: {fileID: 1968297096}
   cardDisplay: {fileID: 5406892077970799481, guid: f0d89327357f51d4f9cda856ee5fe8af, type: 3}
   uno: {fileID: 6870159848961009983, guid: ae2bd198f81105e41bcc9e43a08469e7, type: 3}
+  claimedUNOText: {fileID: 5869187921759859603, guid: 14fb89bdf362ab64f9c306e95e5f5442, type: 3}
   choosingColor: 0
 --- !u!4 &1578113758
 Transform:

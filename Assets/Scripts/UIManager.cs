@@ -47,6 +47,9 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private GameObject uno;
 
+    [SerializeField]
+    private GameObject claimedUNOText;
+
     private Color[] colorList;
 
     private Button red;
@@ -95,6 +98,7 @@ public class UIManager : Singleton<UIManager>
                 GameManager.Instance.CallUNOServerRpc((int)NetworkManager.Singleton.LocalClientId);
             }
         });
+        claimUno.onClick.AddListener(() => { GameManager.Instance.ClaimUNOServerRpc(); });
     }
 
     // Update is called once per frame
@@ -216,5 +220,11 @@ public class UIManager : Singleton<UIManager>
     {
         Debug.Log("UNO!");
         Destroy(GameObject.Instantiate(uno, canvas.transform), 1f);
+    }
+
+    public void ClaimedUNO()
+    {
+        Debug.Log("OOPS! looks like someone forgot to call UNO!");
+        Destroy(GameObject.Instantiate(claimedUNOText, canvas.transform), 2f);
     }
 }

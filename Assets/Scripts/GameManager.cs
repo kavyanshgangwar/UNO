@@ -102,6 +102,19 @@ public class GameManager : NetworkSingleton<GameManager>
             }
         }
     }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void ClaimUNOServerRpc()
+    {
+        if (unoFlags[previousTurn.Value] == true) return;
+        if(cardsCount[previousTurn.Value] <8)
+        {
+            cardsCount[previousTurn.Value] += 4;
+            ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { (ulong)previousTurn.Value } } };
+            DrawCardClientRpc(4, clientRpcParams);
+            ClaimedUNOClientRpc();
+        }
+    }
     [ServerRpc(RequireOwnership =false)]
     public void PlayCardServerRpc(int clientId,int cardColor,int cardNumber,int curColor)
     {
@@ -156,6 +169,11 @@ public class GameManager : NetworkSingleton<GameManager>
         UIManager.Instance.DisplayUNO();
     }
 
+    [ClientRpc]
+    public void ClaimedUNOClientRpc()
+    {
+        UIManager.Instance.ClaimedUNO();
+    }
     void CardPlayed(int oldValue,int newValue)
     {
         Player.Instance.DisplayLastPlayedCard();
