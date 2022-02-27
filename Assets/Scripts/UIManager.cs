@@ -88,7 +88,6 @@ public class UIManager : Singleton<UIManager>
             startGameButton.gameObject.SetActive(false);
         }
         drawCard.onClick.AddListener(() => {
-            drawCard.gameObject.SetActive(false);
             DrawCardButtonCall();
 
         });
@@ -204,6 +203,7 @@ public class UIManager : Singleton<UIManager>
     {
         if(GameManager.Instance.currentTurn.Value == (int)NetworkManager.Singleton.LocalClientId)
         {
+            drawCard.gameObject.SetActive(false);
             Card card = Card.GetRandomCard();
             Player.Instance.AddCard(card);
             GameManager.Instance.IncrementCardCountServerRpc(1,(int)NetworkManager.Singleton.LocalClientId);
