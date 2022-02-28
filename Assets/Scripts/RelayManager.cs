@@ -22,6 +22,7 @@ public class RelayManager : Singleton<RelayManager>
 
     public UnityTransport Transport => NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
 
+    public string roomCode;
     public async Task<RelayHostData> SetupRelay()
     {
         Debug.Log($"Relay Server starting with maxConnections {maxConnections}");
@@ -51,6 +52,7 @@ public class RelayManager : Singleton<RelayManager>
         Transport.SetRelayServerData(hostData.IPv4Address, hostData.Port, hostData.AllocationIDBytes, hostData.Key, hostData.ConnectionData);
 
         Debug.Log($"Relay Server got join code {hostData.JoinCode}");
+        roomCode = hostData.JoinCode;
         return hostData;
     }
 
@@ -81,6 +83,7 @@ public class RelayManager : Singleton<RelayManager>
 
         Transport.SetRelayServerData(relayJoinData.IPv4Address,relayJoinData.Port,relayJoinData.AllocationIDBytes,relayJoinData.Key,relayJoinData.ConnectionData,relayJoinData.HostConnectionData);
         Debug.Log("Client joined game with joincode "+joinCode);
+        roomCode = joinCode;
         return relayJoinData;
     }
 }

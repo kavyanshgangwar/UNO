@@ -51,6 +51,9 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private GameObject claimedUNOText;
 
+    [SerializeField]
+    private TextMeshProUGUI roomCodeText;
+
     private Color[] colorList;
 
     private Button red;
@@ -103,6 +106,7 @@ public class UIManager : Singleton<UIManager>
             }
         });
         claimUno.onClick.AddListener(() => { GameManager.Instance.ClaimUNOServerRpc(); });
+        roomCodeText.text = "Room Code : " + RelayManager.Instance.roomCode;
     }
 
     // Update is called once per frame

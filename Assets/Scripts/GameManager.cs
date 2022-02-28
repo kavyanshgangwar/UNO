@@ -212,4 +212,6 @@ public class GameManager : NetworkSingleton<GameManager>
             GameOverClientRpc(previousTurn.Value);
         }
     }
+
+    
 }

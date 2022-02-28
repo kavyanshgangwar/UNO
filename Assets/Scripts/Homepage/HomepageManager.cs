@@ -16,6 +16,8 @@ public class HomepageManager : MonoBehaviour
 
     [SerializeField]
     private TMP_InputField joinCodeInput;
+
+    
     private void Awake()
     {
         Cursor.visible = true;
@@ -29,9 +31,12 @@ public class HomepageManager : MonoBehaviour
             if (RelayManager.Instance.IsRelayEnabled)
             {
                 await RelayManager.Instance.SetupRelay();
+                
             }
             if (NetworkManager.Singleton.StartHost())
             {
+                
+                
                 Debug.Log("Host Started...");
                 SceneManager.LoadScene("StartGame");
             }
