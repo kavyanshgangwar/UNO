@@ -51,12 +51,29 @@ public class GameManager : NetworkSingleton<GameManager>
                     playerNames = new NetworkList<FixedString32Bytes>();
                     unoFlags = new NetworkList<bool>();
                 }
-                playerNames.Add(localUserName);
+                
                 cardsCount.Add(0);
-                ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { id } } };
-                UpdateNameClientRpc(clientRpcParams);
+                unoFlags.Add(false);
+                if (NetworkManager.Singleton.LocalClientId != id)
+                {
+                    ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { id } } };
+                    UpdateNameClientRpc(clientRpcParams);
+                }
+                else
+                {
+                    playerNames.Add(localUserName);
+                }
             }
             
+        };
+        NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
+        {
+            if (IsServer)
+            {
+                playerNames.RemoveAt((int)id);
+                cardsCount.RemoveAt((int)id);
+                unoFlags.RemoveAt((int)id);
+            }
         };
     }
 
@@ -182,7 +199,10 @@ public class GameManager : NetworkSingleton<GameManager>
     [ServerRpc(RequireOwnership =false)]
     public void UpdateNameServerRpc(int clientId,FixedString32Bytes userName)
     {
-        playerNames[clientId] = userName;
+        if (playerNames.Count <= clientId)
+        {
+            playerNames.Add(userName);
+        }
     }
     [ClientRpc]
     public void UpdateNameClientRpc(ClientRpcParams clientRpcParams = default)
