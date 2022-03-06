@@ -108,6 +108,8 @@ public class UIManager : Singleton<UIManager>
         });
         claimUno.onClick.AddListener(() => { GameManager.Instance.ClaimUNOServerRpc(); });
         roomCodeText.text = "Room Code : " + RelayManager.Instance.roomCode;
+
+        AdManager.Instance.RequestInterstitial();
     }
 
     // Update is called once per frame
@@ -243,6 +245,6 @@ public class UIManager : Singleton<UIManager>
     {
         Debug.Log("GameOver!");
         Debug.Log(GameManager.Instance.playerNames[GameManager.Instance.previousTurn.Value]+" wins!");
-        SceneManager.LoadScene("GameOver");
+        AdManager.Instance.ShowInterstitial();
     }
 }
