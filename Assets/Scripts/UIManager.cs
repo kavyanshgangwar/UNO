@@ -13,7 +13,7 @@ public class UIManager : Singleton<UIManager>
     private Canvas canvas;
 
     [SerializeField]
-    private RawImage playerNameDisplayPrefab;
+    private GameObject[] playerNameDisplayPrefab;
 
     [SerializeField]
     private Button startGameButton;
@@ -54,6 +54,9 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private TextMeshProUGUI roomCodeText;
 
+    [SerializeField]
+    private GameObject[] cardsCountDisplay;
+
     private Color[] colorList;
 
     private Button red;
@@ -65,7 +68,6 @@ public class UIManager : Singleton<UIManager>
 
     private int playersTillNow = 0;
 
-    private List<GameObject> cardsCountDisplay;
     // Start is called before the first frame update
     void Start()
     {
@@ -74,7 +76,6 @@ public class UIManager : Singleton<UIManager>
         colorList[1] = new Color(0.047f, 0.655f, 0.220f,1f);
         colorList[2] = new Color(0.988f, 0.792f, 0.012f,1f);
         colorList[3] = new Color(0.086f, 0.369f, 0.733f,1f);
-        cardsCountDisplay = new List<GameObject>();
         startGameButton.onClick.AddListener(() => {
             if (NetworkManager.Singleton.IsHost)
             {
@@ -112,15 +113,19 @@ public class UIManager : Singleton<UIManager>
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.Instance.playerNames != null &&  playersTillNow < GameManager.Instance.playerNames.Count)
+        if (GameManager.Instance.playerNames != null &&  playersTillNow != GameManager.Instance.playerNames.Count)
         {
-            
-            for (int i = playersTillNow; i < GameManager.Instance.playerNames.Count; i++)
+            // first set all the gameobjects to inactive
+            for(int i = 0; i < 10; i++)
+            {
+                playerNameDisplayPrefab[i].SetActive(false);
+            }
+            // then set only those active that are needed
+            for (int i = 0; i < GameManager.Instance.playerNames.Count; i++)
             {
                 // Display Players on UI
-                RawImage curName = GameObject.Instantiate(playerNameDisplayPrefab, canvas.transform);
-                curName.transform.position = new Vector3(180, 1020 - 70 * i, -1);
-                TextMeshProUGUI name = curName.GetComponentInChildren<TextMeshProUGUI>();
+                playerNameDisplayPrefab[i].SetActive(true);
+                TextMeshProUGUI name = playerNameDisplayPrefab[i].GetComponentInChildren<TextMeshProUGUI>();
                 name.text = GameManager.Instance.playerNames[i].ToString();
             }
             playersTillNow = GameManager.Instance.playerNames.Count;
@@ -131,22 +136,19 @@ public class UIManager : Singleton<UIManager>
     void UpdateCardsCount()
     {
         if (GameManager.Instance.cardsCount == null) return;
-        if (cardsCountDisplay.Count < GameManager.Instance.cardsCount.Count)
+        // set all to inactive
+        for(int i = 0; i < 10; i++)
         {
-            for (int i = cardsCountDisplay.Count; i < GameManager.Instance.cardsCount.Count; i++)
-            {
-                GameObject a = GameObject.Instantiate(cardDisplay, canvas.transform);
-                TextMeshProUGUI count = a.GetComponentInChildren<TextMeshProUGUI>();
-                count.text = GameManager.Instance.cardsCount[i].ToString();
-                a.transform.position = new Vector3(310, 1020 - 70 * i, -1);
-                cardsCountDisplay.Add(a);
-            }
+            cardsCountDisplay[i].SetActive(false);
         }
-        for (int i = 0; i < cardsCountDisplay.Count; i++)
+        // set only the need once active
+        for (int i = 0; i < GameManager.Instance.cardsCount.Count; i++)
         {
+            cardsCountDisplay[i].SetActive(true);
             cardsCountDisplay[i].GetComponentInChildren<TextMeshProUGUI>().text = GameManager.Instance.cardsCount[i].ToString();
             cardsCountDisplay[i].GetComponent<Image>().color = Color.black;
         }
+        // update the color of current player
         cardsCountDisplay[GameManager.Instance.currentTurn.Value].GetComponent<Image>().color = colorList[GameManager.Instance.currentColor.Value];
         
     }
