@@ -113,7 +113,7 @@ public class UIManager : Singleton<UIManager>
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.Instance.playerNames != null &&  playersTillNow != GameManager.Instance.playerNames.Count)
+        if (GameManager.Instance.playerNames != null)
         {
             // first set all the gameobjects to inactive
             for(int i = 0; i < 10; i++)
@@ -128,7 +128,7 @@ public class UIManager : Singleton<UIManager>
                 TextMeshProUGUI name = playerNameDisplayPrefab[i].GetComponentInChildren<TextMeshProUGUI>();
                 name.text = GameManager.Instance.playerNames[i].ToString();
             }
-            playersTillNow = GameManager.Instance.playerNames.Count;
+            
         }
         UpdateCardsCount();
     }
