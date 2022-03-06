@@ -21,6 +21,7 @@ public class GameManager : NetworkSingleton<GameManager>
     public NetworkVariable<int> previousTurn = new NetworkVariable<int>(0);
 
     public int winner = 0;
+    public string localUserName;
     private void Awake()
     {
         DontDestroyOnLoad(this);
@@ -34,6 +35,7 @@ public class GameManager : NetworkSingleton<GameManager>
         lastPlayedCardNumber.OnValueChanged += CardPlayed;
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
+            
             if (IsServer)
             {
                 if(playerNames == null)
@@ -42,7 +44,10 @@ public class GameManager : NetworkSingleton<GameManager>
                     playerNames = new NetworkList<FixedString32Bytes>();
                     unoFlags = new NetworkList<bool>();
                 }
-                playerNames.Add("Player " + id);
+            }
+            if(NetworkManager.Singleton.LocalClientId == id)
+            {
+                playerNames.Add(new FixedString32Bytes(localUserName));
                 cardsCount.Add(0);
             }
         };
