@@ -35,16 +35,15 @@ public class GameManager : NetworkSingleton<GameManager>
         lastPlayedCardNumber.OnValueChanged += CardPlayed;
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
-            if (gameStarted.Value)
-            {
-                if (NetworkManager.Singleton.LocalClientId == id)
-                {
-                    NetworkManager.Singleton.Shutdown();
-                    SceneManager.LoadScene("Homepage");
-                }
-            }
+            
             if (IsServer)
             {
+                if (gameStarted.Value)
+                {
+                    ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { id } } };
+                    DisconnectClientRpc(clientRpcParams);
+                    return;
+                }
                 if(playerNames == null)
                 {
                     cardsCount = new NetworkList<int>();
@@ -70,9 +69,12 @@ public class GameManager : NetworkSingleton<GameManager>
         {
             if (IsServer)
             {
-                playerNames.RemoveAt((int)id);
-                cardsCount.RemoveAt((int)id);
-                unoFlags.RemoveAt((int)id);
+                if (playerNames.Count > (int)id)
+                {
+                    playerNames.RemoveAt((int)id);
+                    cardsCount.RemoveAt((int)id);
+                    unoFlags.RemoveAt((int)id);
+                }
             }
         };
     }
@@ -203,6 +205,14 @@ public class GameManager : NetworkSingleton<GameManager>
         {
             playerNames.Add(userName);
         }
+    }
+
+
+    [ClientRpc]
+    public void DisconnectClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("Homepage");
     }
     [ClientRpc]
     public void UpdateNameClientRpc(ClientRpcParams clientRpcParams = default)
